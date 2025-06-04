@@ -3,7 +3,7 @@ name: Build and Push Docker Image to Repo
 on:
   push:
     branches:
-      - main  # Trigger only on main branch push
+      - main 
 
 jobs:
   docker:

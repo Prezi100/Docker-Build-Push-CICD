@@ -1,0 +1,29 @@
+name: Build and Push Docker Image to Repo
+
+on:
+  push:
+    branches:
+      - main  # Trigger only on main branch push
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Docker Login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKER_NAME }}
+          password: ${{ secrets.DOCKER_PASS }}
+
+      - name: Build Docker Image
+        run: docker build -t ${{ vars.DOCKER_NAME }}/deploy:latest .
+
+      - name: Push Docker Image
+        run: docker push ${{ vars.DOCKER_NAME }}/deploy:latest
+
+      - name: Run Docker Container (for testing)
+        run: docker run -d -p 3000:3000 ${{ vars.DOCKER_NAME }}/deploy:latest

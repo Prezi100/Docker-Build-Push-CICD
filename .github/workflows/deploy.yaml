@@ -28,6 +28,9 @@ jobs:
       - name: Run Docker Container (for testing)
         run: docker run -d -p 3000:3000 ${{ vars.DOCKER_NAME }}/deploy:latest
 
+      - name: List all Repository!!!!
+        run: ls
+
   deploy-to-aws:
     needs: docker
     runs-on: ubuntu-latest

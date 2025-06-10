@@ -28,13 +28,10 @@ jobs:
       - name: Run Docker Container (for testing)
         run: docker run -d -p 3000:3000 ${{ vars.DOCKER_NAME }}/deploy:latest
 
-      - name: List all Repository!!!!
-        run: ls
 
   deploy-to-aws:
     needs: docker
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -43,9 +40,11 @@ jobs:
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.AWS_EC2_HOST }}
-          username: ${{ vars.AWS_EC2_USER }}  
+          username: ${{ secrets.AWS_EC2_USER }}  # Changed from vars to secrets
           key: ${{ secrets.AWS_EC2_SSH_KEY }}
           script: |
+            sudo usermod -aG docker $USER
+            newgrp docker
             docker pull ${{ vars.DOCKER_NAME }}/deploy:latest
             docker stop deploy || true
             docker rm deploy || true

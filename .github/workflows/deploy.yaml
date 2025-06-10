@@ -3,7 +3,7 @@ name: Build and Push Docker Image to Repo
 on:
   push:
     branches:
-      - main 
+      - main
 
 jobs:
   docker:
@@ -27,3 +27,23 @@ jobs:
 
       - name: Run Docker Container (for testing)
         run: docker run -d -p 3000:3000 ${{ vars.DOCKER_NAME }}/deploy:latest
+
+  deploy-to-aws:
+    needs: docker
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to AWS EC2 via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.AWS_EC2_HOST }}
+          username: ${{ vars.AWS_EC2_USER }}  
+          key: ${{ secrets.AWS_EC2_SSH_KEY }}
+          script: |
+            docker pull ${{ vars.DOCKER_NAME }}/deploy:latest
+            docker stop deploy || true
+            docker rm deploy || true
+            docker run -d -p 3000:3000 --name deploy ${{ vars.DOCKER_NAME }}/deploy:latest

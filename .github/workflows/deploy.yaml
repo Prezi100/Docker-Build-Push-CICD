@@ -43,7 +43,7 @@ jobs:
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.AWS_EC2_HOST }}
-          username: ${{ vars.AWS_EC2_USER }}  # Changed from vars to secrets
+          username: ${{ vars.AWS_EC2_USER }}  
           key: ${{ secrets.AWS_EC2_SSH_KEY }}
           script: |
             sudo usermod -aG docker $USER
